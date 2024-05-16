@@ -1,11 +1,11 @@
 package br.com.alura.adopet.api.controller;
 
-import br.com.alura.adopet.api.model.Tutor;
-import br.com.alura.adopet.api.repository.TutorRepository;
+import br.com.alura.adopet.api.dto.AtualizarTutorDto;
+import br.com.alura.adopet.api.dto.SolicitarCadastroTutorDto;
+import br.com.alura.adopet.api.service.TutorService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -13,27 +13,28 @@ import org.springframework.web.bind.annotation.*;
 public class TutorController {
 
     @Autowired
-    private TutorRepository repository;
+    private TutorService tutorService;
 
     @PostMapping
-    @Transactional
-    public ResponseEntity<String> cadastrar(@RequestBody @Valid Tutor tutor) {
-        boolean telefoneJaCadastrado = repository.existsByTelefone(tutor.getTelefone());
-        boolean emailJaCadastrado = repository.existsByEmail(tutor.getEmail());
+    public ResponseEntity<String> cadastrar(@RequestBody @Valid SolicitarCadastroTutorDto dto) {
 
-        if (telefoneJaCadastrado || emailJaCadastrado) {
-            return ResponseEntity.badRequest().body("Dados já cadastrados para outro tutor!");
-        } else {
-            repository.save(tutor);
+        try {
+            tutorService.solicitarCadastro(dto);
             return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
     @PutMapping
-    @Transactional
-    public ResponseEntity<String> atualizar(@RequestBody @Valid Tutor tutor) {
-        repository.save(tutor);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<String> atualizar(@RequestBody @Valid AtualizarTutorDto dto) {
+        try {
+            tutorService.solicitarAtualizacao(dto);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+
     }
 
 }
