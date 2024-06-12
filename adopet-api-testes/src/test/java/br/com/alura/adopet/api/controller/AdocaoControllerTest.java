@@ -12,6 +12,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -24,27 +25,8 @@ class AdocaoControllerTest {
     private AdocaoService service;
 
     @Test
-    void deveriaDevolverCodigo400ParaSolicitacaoDeAdocaoComErros() throws Exception {
-
-        //ARANGE
-        String json = "{}";
-
-
-        //ACT
-        MockHttpServletResponse response = mvc.perform(post("/adocoes")
-                .content(json)
-                .contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse();
-
-
-        //ASSERT
-        Assertions.assertEquals(400, response.getStatus());
-    }
-
-
-    @Test
     void deveriaDevolverCodigo200ParaSolicitacaoDeAdocaoSemErro() throws Exception {
 
-        //ARANGE
         String json = """
                 {   "idPet": 1,
                     "idTutor": 1,
@@ -52,15 +34,82 @@ class AdocaoControllerTest {
                 }
                 """;
 
-
-        //ACT
         MockHttpServletResponse response = mvc.perform(post("/adocoes")
                 .content(json)
                 .contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse();
 
-
-        //ASSERT
         Assertions.assertEquals(200, response.getStatus());
+    }
+
+    @Test
+    void deveriaDevolverCodigo400ParaSolicitacaoDeAdocaoComErros() throws Exception {
+
+        String json = "{}";
+
+        MockHttpServletResponse response = mvc.perform(post("/adocoes")
+                .content(json)
+                .contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        Assertions.assertEquals(400, response.getStatus());
+    }
+
+    @Test
+    void deveAprovarAdocaoSemErroRetornandoCodigo200() throws Exception {
+
+        String json = """
+                    {
+                    "idAdocao":10
+                    }
+                    """;
+
+        MockHttpServletResponse response = mvc.perform(put("/adocoes/aprovar")
+                .content(json)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+
+        Assertions.assertEquals(200, response.getStatus());
+    }
+
+    @Test
+    void deveAprovarAdocaoComErroRetornandoCodigo400() throws Exception {
+
+        String json = "{}";
+
+        MockHttpServletResponse response = mvc.perform(put("/adocoes/aprovar")
+                        .content(json)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+
+        Assertions.assertEquals(400, response.getStatus());
+    }
+
+    @Test
+    void deveReprovarAdocaoSemErroRetornandoCodigo200() throws Exception {
+
+        String json = """
+                    {
+                    "idAdocao": 10,
+                    "justificativa": "justificativa qualquer"
+                    }
+                    """;
+
+        MockHttpServletResponse response = mvc.perform(put("/adocoes/reprovar")
+                .content(json).contentType(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+
+        Assertions.assertEquals(200, response.getStatus());
+    }
+
+    @Test
+    void deveReprovarAdocaoComErroRetornandoCodigo400() throws Exception {
+
+        String json = "{}";
+
+        MockHttpServletResponse response = mvc.perform(put("/adocoes/reprovar")
+                        .content(json).contentType(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+
+        Assertions.assertEquals(400, response.getStatus());
     }
 
 }
